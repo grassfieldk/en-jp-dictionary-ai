@@ -1,0 +1,106 @@
+// prisma/schema.prisma
+// Define your database models
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/**
+ * 単語
+ */
+model Word {
+  id                    Int      @id @default(autoincrement())
+  headword              String // 見出し語
+  pronunciation         String? // 発音記号
+  pos                   String // 品詞
+  definition            String // 定義
+  past                  String? // 過去形
+  past_participle       String? // 過去分詞
+  present_participle    String? // 現在分詞
+  third_person_singular String? // 三人称単数形
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  examples Example[]
+
+  @@unique([headword, pos])
+  @@index([headword])
+  @@index([pos])
+}
+
+model Example {
+  id          Int      @id @default(autoincrement())
+  word        Word     @relation(fields: [word_id], references: [id])
+  word_id     Int // 単語キー
+  slot        Int // スロット番号（1: 基本, 2: ゲーム, 3: プログラミング）
+  sentence_en String // 例文
+  sentence_ja String // 例文（日本語訳）
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@index([word_id])
+  @@index([slot])
+}
+
+/**
+ * 類義語
+ */
+model SynonymGroup {
+  id          Int                 @id @default(autoincrement())
+  title       String // グループ名
+  description String? // 説明
+  entries     SynonymGroupEntry[]
+
+  @@index([title])
+}
+
+model SynonymGroupEntry {
+  id          Int          @id @default(autoincrement())
+  group       SynonymGroup @relation(fields: [group_id], references: [id])
+  group_id    Int // グループキー
+  word        String // 単語
+  pos         String // 品詞
+  description String // 説明
+  sentence_en String // 例文
+  sentence_ja String // 例文（日本語訳）
+  order       Int          @default(0)
+
+  @@unique([group_id, word, pos])
+  @@index([group_id])
+  @@index([word])
+  @@index([pos])
+}
+
+/**
+ * 対義語
+ */
+model AntonymGroup {
+  id          Int                 @id @default(autoincrement())
+  title       String // グループ名
+  description String? // 説明
+  entries     AntonymGroupEntry[]
+
+  @@index([title])
+}
+
+model AntonymGroupEntry {
+  id          Int          @id @default(autoincrement())
+  group       AntonymGroup @relation(fields: [group_id], references: [id])
+  group_id    Int // グループキー
+  word        String // 単語
+  pos         String // 品詞
+  description String // 説明
+  sentence_en String // 例文
+  sentence_ja String // 例文（日本語訳）
+  order       Int          @default(0)
+
+  @@unique([group_id, word, pos])
+  @@index([group_id])
+  @@index([word])
+  @@index([pos])
+}
