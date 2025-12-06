@@ -1,13 +1,14 @@
 {
-  "name": "en-jp-dictionary-ai",
+  "name": "en-ja-dictionary-ai",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check",
-    "format": "biome format --write"
+    "format": "biome format . --write",
+    "check": "biome check .",
+    "fix": "biome check . --write"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.1.0",
